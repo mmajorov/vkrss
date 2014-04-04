@@ -15,16 +15,17 @@ get '/:nickname' do
   
   rss = RSS::Maker.make("atom") do |maker|
     maker.channel.author = vk_user
-    maker.channel.updated = Time.now.to_s
-    maker.channel.about = "http://www.ruby-lang.org/en/feeds/news.rss"
+    maker.channel.updated = Time.at(vk_posts.first['date'].to_i).to_s
+    maker.channel.about = vk_api.wall_url
     maker.channel.title = vk_user
 
     vk_posts.each do |post|
       maker.items.new_item do |item|
-        item.link = "http://vk.com/"
-        item.title = "vk.post"
+        item.id = post['id'].to_s
+        item.link = vk_api.url_for_wall(post)
+        item.title = "#{post['text'][0..19]}..."
         item.summary = post['text']
-        item.updated = Time.now.to_s
+        item.updated = Time.at(post['date'].to_i).to_s
       end
     end
   end

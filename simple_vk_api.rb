@@ -9,23 +9,34 @@ class SimpleVkApi
   end
   
   def full_name
-    @full_name ||= begin
-      rawdata = request "users.get", user_ids: @user
-      user = rawdata.first
-      [user['first_name'], user['last_name']].join ' '
-    end
+    @full_name ||= [user_info['first_name'], user_info['last_name']].join ' '
   end
   
   def wall_posts
     @posts ||= begin
       rawdata = request "wall.get", domain: @user
       posts = rawdata
-      posts.shift
+      posts.shift #first element is counter
       posts
     end
   end
   
+  def url_for_wall(post)
+    "http://vk.com/#{@user}?w=wall#{user_info['uid']}_#{post['id']}"
+  end
+
+  def wall_url
+    "http://vk.com/#{@user}"  
+  end
+  
   private
+    def user_info
+      @user_info ||= begin
+        rawdata = request "users.get", user_ids: @user
+        rawdata.first    
+      end
+    end
+    
     def request(method, params)
       url = "http://api.vk.com/method/#{method}?#{URI.escape(params.collect{|k,v| "#{k}=#{v}"}.join('&'))}"
       uri = URI.parse(url) 
@@ -35,7 +46,7 @@ class SimpleVkApi
         response = http.request(request)      
         result = JSON.parse(response.body)
       rescue
-        result = {'error' => {error_msg: 'Network Error'}}.to_json
+        result = {'error' => {error_msg: 'Network Error'}}
       end
       raise "Vk Api Error" if result['error']
       
