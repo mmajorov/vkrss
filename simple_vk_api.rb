@@ -48,7 +48,7 @@ class SimpleVkApi
       rescue
         result = {'error' => {error_msg: 'Network Error'}}
       end
-      raise "Vk Api Error" if result['error']
+raise "Vk Api Error: #{result['error']}" if result['error']
       
       result['response']
     end

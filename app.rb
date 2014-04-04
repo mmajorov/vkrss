@@ -7,7 +7,7 @@ get '/' do
 end
 
 get '/:nickname' do
-  nickname = 'michas'
+  nickname = params[:nickname]
   
   vk_api = SimpleVkApi.new nickname
   vk_user = vk_api.full_name
