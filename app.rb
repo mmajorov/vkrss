@@ -3,7 +3,12 @@ require 'rss'
 require './simple_vk_api'
 
 get '/' do
-  'Hello world!'
+  haml :index
+end
+
+post '/' do
+  return haml :index unless params[:nickname]
+  redirect to("/#{params[:nickname]}")
 end
 
 get '/:nickname' do
